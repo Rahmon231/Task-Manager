@@ -26,7 +26,7 @@ public interface TaskDao {
     LiveData<Task> getTask(long id);
 
     @Update
-    void update(Task task);
+    void updateTask(Task task);
 
     @Delete
     void deleteTask(Task task);
