@@ -3,6 +3,9 @@ package com.lemzeeyyy.taskmanagerapp.model;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.lemzeeyyy.taskmanagerapp.util.DateConverter;
 
 import java.util.Date;
 
@@ -12,18 +15,23 @@ public class Task {
     @PrimaryKey(autoGenerate = true)
     public long taskId;
 
+    public String task;
+
     public Priority priority;
 
     @ColumnInfo(name = "due_date")
+    @TypeConverters(DateConverter.class)
     public Date dueDate;
 
     @ColumnInfo(name = "date_created")
+    @TypeConverters(DateConverter.class)
     public Date dateCreated;
 
     @ColumnInfo(name = "is_done")
     public Boolean isDone;
 
-    public Task(Priority priority, Date dueDate, Date dateCreated, Boolean isDone) {
+    public Task(String task, Priority priority, Date dueDate, Date dateCreated, Boolean isDone) {
+        this.task = task;
         this.priority = priority;
         this.dueDate = dueDate;
         this.dateCreated = dateCreated;
@@ -36,6 +44,14 @@ public class Task {
 
     public void setTaskId(long taskId) {
         this.taskId = taskId;
+    }
+
+    public String getTask() {
+        return task;
+    }
+
+    public void setTask(String task) {
+        this.task = task;
     }
 
     public Priority getPriority() {
@@ -74,6 +90,7 @@ public class Task {
     public String toString() {
         return "Task{" +
                 "taskId=" + taskId +
+                ", task='" + task + '\'' +
                 ", priority=" + priority +
                 ", dueDate=" + dueDate +
                 ", dateCreated=" + dateCreated +
