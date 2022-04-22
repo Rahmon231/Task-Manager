@@ -10,6 +10,7 @@ import com.lemzeeyyy.taskmanagerapp.model.TaskViewModel;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private TaskViewModel taskViewModel;
@@ -32,6 +34,15 @@ public class MainActivity extends AppCompatActivity {
         taskViewModel = new ViewModelProvider
                 .AndroidViewModelFactory(MainActivity.this.getApplication())
                 .create(TaskViewModel.class);
+        taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
+            @Override
+            public void onChanged(List<Task> tasks) {
+                for (Task task :
+                        tasks) {
+                    Log.d("TAG", "onChanged: "+task.priority.toString());
+                }
+            }
+        });
 
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -41,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
                 Task task = new Task("todo", Priority.HIGH, Calendar.getInstance().getTime(),
                         Calendar.getInstance().getTime(),false);
                 TaskViewModel.insert(task);
-                Log.d("TAG", "onClick: "+taskViewModel.getTask(0).toString());
             }
         });
     }
