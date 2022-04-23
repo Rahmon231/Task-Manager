@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.lemzeeyyy.taskmanagerapp.adapter.RecyclerViewAdapter;
 import com.lemzeeyyy.taskmanagerapp.model.Priority;
 import com.lemzeeyyy.taskmanagerapp.model.Task;
 import com.lemzeeyyy.taskmanagerapp.model.TaskViewModel;
@@ -12,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.View;
@@ -24,6 +27,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private TaskViewModel taskViewModel;
+    private RecyclerView recyclerView;
+    private RecyclerViewAdapter adapter;
+    private int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,28 +37,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         taskViewModel = new ViewModelProvider
                 .AndroidViewModelFactory(MainActivity.this.getApplication())
                 .create(TaskViewModel.class);
-        taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
-            @Override
-            public void onChanged(List<Task> tasks) {
-                for (Task task :
-                        tasks) {
-                    Log.d("TAG", "onChanged: "+task.priority.toString());
-                }
-            }
+        taskViewModel.getAllTasks().observe(this, tasks -> {
+
+            adapter = new RecyclerViewAdapter(tasks);
+            recyclerView.setAdapter(adapter);
         });
 
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Task task = new Task("todo", Priority.HIGH, Calendar.getInstance().getTime(),
-                        Calendar.getInstance().getTime(),false);
-                TaskViewModel.insert(task);
-            }
+        fab.setOnClickListener(view -> {
+            Task task = new Task("Task "+counter++, Priority.HIGH, Calendar.getInstance().getTime(),
+                    Calendar.getInstance().getTime(),false);
+           TaskViewModel.insert(task);
         });
     }
 
