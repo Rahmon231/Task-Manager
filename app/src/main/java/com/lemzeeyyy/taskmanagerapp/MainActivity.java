@@ -2,6 +2,7 @@ package com.lemzeeyyy.taskmanagerapp;
 
 import android.os.Bundle;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.lemzeeyyy.taskmanagerapp.adapter.RecyclerViewAdapter;
@@ -11,6 +12,7 @@ import com.lemzeeyyy.taskmanagerapp.model.TaskViewModel;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
     private int counter = 0;
+    BottomSheetFragment bottomSheetFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        bottomSheetFragment = new BottomSheetFragment();
+        ConstraintLayout constraintLayout = findViewById(R.id.bottomSheet);
+        BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior = BottomSheetBehavior.from(constraintLayout);
+        bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.STATE_HIDDEN);
         taskViewModel = new ViewModelProvider
                 .AndroidViewModelFactory(MainActivity.this.getApplication())
                 .create(TaskViewModel.class);
@@ -52,10 +59,16 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
-            Task task = new Task("Task "+counter++, Priority.HIGH, Calendar.getInstance().getTime(),
-                    Calendar.getInstance().getTime(),false);
-           TaskViewModel.insert(task);
+//            Task task = new Task("Task "+counter++, Priority.HIGH, Calendar.getInstance().getTime(),
+//                    Calendar.getInstance().getTime(),false);
+//           TaskViewModel.insert(task);
+
+            showButtomSheetDialog();
         });
+    }
+
+    private void showButtomSheetDialog() {
+        bottomSheetFragment.show(getSupportFragmentManager(),bottomSheetFragment.getTag());
     }
 
     @Override
