@@ -23,8 +23,9 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.Calendar;
+import java.util.Date;
 
-public class BottomSheetFragment extends BottomSheetDialogFragment {
+public class BottomSheetFragment extends BottomSheetDialogFragment implements View.OnClickListener {
     private EditText enterTodo;
     private ImageButton calendarBtn;
     private ImageButton priorityBtn;
@@ -34,6 +35,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     private ImageButton saveBtn;
     private CalendarView calendarView;
     private Group calendarGroup;
+    private Date dueDate;
+    Calendar calendar = Calendar.getInstance();
 
     public BottomSheetFragment() {
     }
@@ -53,25 +56,61 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         priorityBtn = view.findViewById(R.id.priority_todo_button);
         priorityRadioGroup = view.findViewById(R.id.radioGroup_priority);
         Chip todayChip = view.findViewById(R.id.today_chip);
+        todayChip.setOnClickListener(this);
         Chip tomorrowChip = view.findViewById(R.id.tomorrow_chip);
+        tomorrowChip.setOnClickListener(this);
         Chip nextWeekChip = view.findViewById(R.id.next_week_chip);
+        nextWeekChip.setOnClickListener(this);
 
         return view;
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        saveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String task = enterTodo.getText().toString().trim();
-                if(!TextUtils.isEmpty(task)){
-                    Task myTast = new Task(task, Priority.LOW,Calendar.getInstance().getTime(),
-                            Calendar.getInstance().getTime(), false);
-                    TaskViewModel.insert(myTast);
-                }
+        calendarBtn.setOnClickListener(view1 -> calendarGroup.setVisibility(
+                calendarGroup.getVisibility() == View.GONE ? View.VISIBLE:View.GONE));
+
+        calendarView.setOnDateChangeListener((calendarView, year, month, dayOfMonth) -> {
+            calendar.clear();
+            calendar.set(year,month,dayOfMonth);
+            dueDate = calendar.getTime();
+
+        });
+
+        saveBtn.setOnClickListener(view12 -> {
+            String task = enterTodo.getText().toString().trim();
+            if(!TextUtils.isEmpty(task) && dueDate!=null){
+                Task myTast = new Task(task, Priority.LOW,dueDate,
+                        Calendar.getInstance().getTime(), false);
+                TaskViewModel.insert(myTast);
             }
         });
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id){
+            case R.id.today_chip:
+                calendar.add(Calendar.DAY_OF_YEAR,0);
+                dueDate = calendar.getTime();
+
+                break;
+            case R.id.tomorrow_chip:
+                calendar.add((Calendar.DAY_OF_YEAR),1);
+                dueDate = calendar.getTime();
+
+                break;
+            case R.id.next_week_chip:
+                calendar.add((Calendar.DAY_OF_YEAR),7);
+                dueDate = calendar.getTime();
+
+                break;
+
+            default:
+                break;
+        }
 
     }
 }
