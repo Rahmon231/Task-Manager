@@ -36,14 +36,15 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
     private ImageButton priorityBtn;
     private RadioGroup priorityRadioGroup;
     private RadioButton selectedRadioBtn;
-    private int selected;
+    private int selectedBtnId;
     private ImageButton saveBtn;
     private CalendarView calendarView;
     private Group calendarGroup;
     private Date dueDate;
     Calendar calendar = Calendar.getInstance();
     private SharedViewModel sharedViewModel;
-    private Boolean isEdit;
+    private Boolean isEdit = false;
+    private Priority priority;
 
     public BottomSheetFragment() {
     }
@@ -92,6 +93,33 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
                     calendarGroup.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
             Utils.hideSoftKeyboard(view1);
         });
+        priorityBtn.setOnClickListener(view13 -> {
+            Utils.hideSoftKeyboard(view13);
+
+            priorityRadioGroup.setVisibility(priorityRadioGroup
+                    .getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+        });
+        priorityRadioGroup.setOnCheckedChangeListener((radioGroup, checkedId) -> {
+           if(priorityBtn.getVisibility() == View.VISIBLE){
+               selectedBtnId = checkedId;
+               selectedRadioBtn = view.findViewById(selectedBtnId);
+               switch (selectedBtnId){
+                   case R.id.radioButton_high:
+                       priority = Priority.HIGH;
+                       break;
+                   case R.id.radioButton_low:
+                       priority = Priority.LOW;
+                       break;
+                   case R.id.radioButton_med:
+                       priority = Priority.MEDIUM;
+                       break;
+                   default:
+                       priority = Priority.LOW;
+               }
+           }else {
+               priority = Priority.LOW;
+           }
+        });
 
 
         calendarView.setOnDateChangeListener((calendarView, year, month, dayOfMonth) -> {
@@ -103,8 +131,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
 
         saveBtn.setOnClickListener(view12 -> {
             String task = enterTodo.getText().toString().trim();
-            if(!TextUtils.isEmpty(task) && dueDate!=null){
-                Task myTast = new Task(task, Priority.LOW,dueDate,
+            if(!TextUtils.isEmpty(task) && dueDate!=null && priority!=null){
+                Task myTast = new Task(task, priority,dueDate,
                         Calendar.getInstance().getTime(), false);
                 if(isEdit){
                     Task updateTask = sharedViewModel.getSelectedItem().getValue();
@@ -119,6 +147,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
                     TaskViewModel.insert(myTast);
                 }
                 enterTodo.setText("");
+
                 if(this.isVisible()){
                     this.dismiss();
                 }
