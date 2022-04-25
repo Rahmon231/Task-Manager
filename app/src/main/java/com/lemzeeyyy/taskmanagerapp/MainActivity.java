@@ -1,5 +1,7 @@
 package com.lemzeeyyy.taskmanagerapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -8,6 +10,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.lemzeeyyy.taskmanagerapp.adapter.OnTodoClickListener;
 import com.lemzeeyyy.taskmanagerapp.adapter.RecyclerViewAdapter;
 import com.lemzeeyyy.taskmanagerapp.model.Priority;
+import com.lemzeeyyy.taskmanagerapp.model.SharedViewModel;
 import com.lemzeeyyy.taskmanagerapp.model.Task;
 import com.lemzeeyyy.taskmanagerapp.model.TaskViewModel;
 
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
     private RecyclerViewAdapter adapter;
     private int counter = 0;
     BottomSheetFragment bottomSheetFragment;
+    private SharedViewModel sharedViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
             adapter = new RecyclerViewAdapter(tasks,this);
             recyclerView.setAdapter(adapter);
         });
+        sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -63,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
 //            Task task = new Task("Task "+counter++, Priority.HIGH, Calendar.getInstance().getTime(),
 //                    Calendar.getInstance().getTime(),false);
 //           TaskViewModel.insert(task);
-
             showButtomSheetDialog();
         });
     }
@@ -96,11 +100,22 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
 
     @Override
     public void onTodoClick(int position, Task task) {
+        //Log.d("Clicked", "onTodoClick: "+task.getTask());
+        sharedViewModel.setSelectItem(task);
 
     }
 
     @Override
-    public void onTodoRadioBtn(Task task) {
-        TaskViewModel.delete(task);
+    public void onTodoRadioBtnClick( Task task) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Delete Task")
+                .setMessage("Do you want to delete this task?")
+                .setPositiveButton("Delete", (dialogInterface, i) -> TaskViewModel.delete(task))
+                .setNegativeButton("Cancel",null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+        adapter.notifyDataSetChanged();
+
     }
+
 }

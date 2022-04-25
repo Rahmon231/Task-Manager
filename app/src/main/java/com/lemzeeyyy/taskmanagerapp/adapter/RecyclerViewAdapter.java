@@ -1,5 +1,7 @@
 package com.lemzeeyyy.taskmanagerapp.adapter;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +39,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull RecyclerViewAdapter.ViewHolder holder, int position) {
         Task task = taskList.get(position);
         holder.todo_task.setText(task.getTask());
+
         String formatted = Utils.formatDate(task.getDueDate());
         holder.todayChip.setText(formatted);
 
@@ -60,17 +63,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             todayChip = itemView.findViewById(R.id.todo_row_chip);
             this.onTodoClickListener = todoClickListener;
             itemView.setOnClickListener(this);
+            radioButton.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             Task currTask = taskList.get(getAdapterPosition());;
-        int id = view.getId();
+            int id = view.getId();
         if(id == R.id.todo_row_layout){
             onTodoClickListener.onTodoClick(getAdapterPosition(),currTask);
         } else if (id == R.id.todo_radio_button){
-            onTodoClickListener.onTodoRadioBtn(currTask);
 
+            onTodoClickListener.onTodoRadioBtnClick(currTask);
             }
         }
     }
