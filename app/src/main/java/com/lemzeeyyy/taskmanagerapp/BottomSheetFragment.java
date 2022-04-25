@@ -14,12 +14,14 @@ import android.widget.RadioGroup;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.chip.Chip;
 import com.lemzeeyyy.taskmanagerapp.model.Priority;
+import com.lemzeeyyy.taskmanagerapp.model.SharedViewModel;
 import com.lemzeeyyy.taskmanagerapp.model.Task;
 import com.lemzeeyyy.taskmanagerapp.model.TaskViewModel;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.Group;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.Calendar;
@@ -37,6 +39,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
     private Group calendarGroup;
     private Date dueDate;
     Calendar calendar = Calendar.getInstance();
+    private SharedViewModel sharedViewModel;
 
     public BottomSheetFragment() {
     }
@@ -67,6 +70,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
         calendarBtn.setOnClickListener(view1 -> calendarGroup.setVisibility(
                 calendarGroup.getVisibility() == View.GONE ? View.VISIBLE:View.GONE));
 
