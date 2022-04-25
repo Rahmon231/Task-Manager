@@ -2,6 +2,8 @@ package com.lemzeeyyy.taskmanagerapp.adapter;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +43,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.todo_task.setText(task.getTask());
 
         String formatted = Utils.formatDate(task.getDueDate());
+        ColorStateList colorStateList = new ColorStateList(new int[][]{
+                new int[]{-android.R.attr.enabled},
+                new int[]{android.R.attr.enabled}
+        },
+                new int[]{
+                Color.LTGRAY,
+                Utils.priorityColor(task)
+        });
         holder.todayChip.setText(formatted);
+        holder.todayChip.setTextColor(Utils.priorityColor(task));
+        holder.todayChip.setChipIconTint(colorStateList);
+        holder.radioButton.setButtonTintList(colorStateList);
 
     }
 

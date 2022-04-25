@@ -80,7 +80,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
             isEdit = sharedViewModel.getEdit();
             Task task = sharedViewModel.getSelectedItem().getValue();
             enterTodo.setText(task.getTask());
-            Log.d("TAGResume", "onResume: "+task.getTask());
+            //Log.d("TAGResume", "onResume: "+task.getTask());
         }
     }
 
@@ -133,7 +133,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
             String task = enterTodo.getText().toString().trim();
             if(!TextUtils.isEmpty(task) && dueDate!=null && priority!=null){
                 Task myTast = new Task(task, priority,dueDate,
-                        Calendar.getInstance().getTime(), false);
+                        Calendar.getInstance().getTime(), true);
                 if(isEdit){
                     Task updateTask = sharedViewModel.getSelectedItem().getValue();
                     updateTask.setTask(task);
@@ -176,7 +176,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
             case R.id.next_week_chip:
                 calendar.add((Calendar.DAY_OF_YEAR),7);
                 dueDate = calendar.getTime();
-
                 break;
 
             default:
