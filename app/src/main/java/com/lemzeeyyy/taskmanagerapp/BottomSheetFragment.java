@@ -2,6 +2,7 @@ package com.lemzeeyyy.taskmanagerapp;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,9 +69,20 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(sharedViewModel.getSelectedItem().getValue() != null){
+            Task task = sharedViewModel.getSelectedItem().getValue();
+            enterTodo.setText(task.getTask());
+            Log.d("TAGResume", "onResume: "+task.getTask());
+        }
+    }
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+
         calendarBtn.setOnClickListener(view1 -> calendarGroup.setVisibility(
                 calendarGroup.getVisibility() == View.GONE ? View.VISIBLE:View.GONE));
 
