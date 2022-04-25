@@ -14,10 +14,12 @@ import android.widget.RadioGroup;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.snackbar.Snackbar;
 import com.lemzeeyyy.taskmanagerapp.model.Priority;
 import com.lemzeeyyy.taskmanagerapp.model.SharedViewModel;
 import com.lemzeeyyy.taskmanagerapp.model.Task;
 import com.lemzeeyyy.taskmanagerapp.model.TaskViewModel;
+import com.lemzeeyyy.taskmanagerapp.util.Utils;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.Group;
@@ -41,6 +43,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
     private Date dueDate;
     Calendar calendar = Calendar.getInstance();
     private SharedViewModel sharedViewModel;
+    private Boolean isEdit;
 
     public BottomSheetFragment() {
     }
@@ -73,6 +76,7 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
     public void onResume() {
         super.onResume();
         if(sharedViewModel.getSelectedItem().getValue() != null){
+            isEdit = sharedViewModel.getEdit();
             Task task = sharedViewModel.getSelectedItem().getValue();
             enterTodo.setText(task.getTask());
             Log.d("TAGResume", "onResume: "+task.getTask());
@@ -83,8 +87,12 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
         super.onViewCreated(view, savedInstanceState);
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        calendarBtn.setOnClickListener(view1 -> calendarGroup.setVisibility(
-                calendarGroup.getVisibility() == View.GONE ? View.VISIBLE:View.GONE));
+        calendarBtn.setOnClickListener(view1 -> {
+            calendarGroup.setVisibility(
+                    calendarGroup.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+            Utils.hideSoftKeyboard(view1);
+        });
+
 
         calendarView.setOnDateChangeListener((calendarView, year, month, dayOfMonth) -> {
             calendar.clear();
@@ -98,7 +106,25 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
             if(!TextUtils.isEmpty(task) && dueDate!=null){
                 Task myTast = new Task(task, Priority.LOW,dueDate,
                         Calendar.getInstance().getTime(), false);
-                TaskViewModel.insert(myTast);
+                if(isEdit){
+                    Task updateTask = sharedViewModel.getSelectedItem().getValue();
+                    updateTask.setTask(task);
+                    updateTask.setDateCreated(Calendar.getInstance().getTime());
+                    updateTask.setPriority(Priority.LOW);
+                    updateTask.setDueDate(dueDate);
+                    updateTask.setDone(true);
+                    TaskViewModel.update(updateTask);
+                    sharedViewModel.setEdit(false);
+                }else {
+                    TaskViewModel.insert(myTast);
+                }
+                enterTodo.setText("");
+                if(this.isVisible()){
+                    this.dismiss();
+                }
+            }else{
+                Snackbar.make(saveBtn,R.string.empty_field,Snackbar.LENGTH_LONG)
+                        .show();
             }
         });
 
