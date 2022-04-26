@@ -25,6 +25,6 @@
     <string name="radio_med">Medium</string>
     <string name="radio_low">Low</string>
     <string name="image_description">button image</string>
-    <string name="about_text">Todoist Clone App - by Lemzy - version 0.1</string>
+    <string name="about_text">Todoist Clone App - by Lemzy - version 1.0</string>
     <string name="add_todos">Add a Todo...</string>
 </resources>
