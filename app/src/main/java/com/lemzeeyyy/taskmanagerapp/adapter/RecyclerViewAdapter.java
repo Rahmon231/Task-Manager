@@ -48,8 +48,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 new int[]{android.R.attr.enabled}
         },
                 new int[]{
-                Color.LTGRAY,
-                Utils.priorityColor(task)
+                        Utils.priorityColor(task),
+                        Color.LTGRAY
+
         });
         holder.todayChip.setText(formatted);
         holder.todayChip.setTextColor(Utils.priorityColor(task));

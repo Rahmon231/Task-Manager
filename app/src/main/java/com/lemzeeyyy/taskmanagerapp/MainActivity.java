@@ -2,6 +2,7 @@ package com.lemzeeyyy.taskmanagerapp;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -89,9 +90,9 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            Intent intent = new Intent(MainActivity.this, AboutActivity.class);
+            startActivity(intent);
         }
-
         return super.onOptionsItemSelected(item);
     }
 
