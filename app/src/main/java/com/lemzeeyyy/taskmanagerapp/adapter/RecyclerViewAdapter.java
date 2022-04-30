@@ -1,9 +1,10 @@
 package com.lemzeeyyy.taskmanagerapp.adapter;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,15 +19,22 @@ import com.lemzeeyyy.taskmanagerapp.R;
 import com.lemzeeyyy.taskmanagerapp.model.Task;
 import com.lemzeeyyy.taskmanagerapp.util.Utils;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private final List<Task> taskList;
     private final OnTodoClickListener todoClickListener;
+    private MediaPlayer mediaPlayer;
 
-    public RecyclerViewAdapter(List<Task> taskList,OnTodoClickListener todoClickListener) {
+
+    public RecyclerViewAdapter(List<Task> taskList, OnTodoClickListener todoClickListener, Context context) {
         this.taskList = taskList;
         this.todoClickListener = todoClickListener;
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer = MediaPlayer.create(context,R.raw.watch_me);
+
+
     }
 
     @NonNull
@@ -41,7 +49,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull RecyclerViewAdapter.ViewHolder holder, int position) {
         Task task = taskList.get(position);
         holder.todo_task.setText(task.getTask());
-
         String formatted = Utils.formatDate(task.getDueDate());
         ColorStateList colorStateList = new ColorStateList(new int[][]{
                 new int[]{-android.R.attr.enabled},
@@ -78,11 +85,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             this.onTodoClickListener = todoClickListener;
             itemView.setOnClickListener(this);
             radioButton.setOnClickListener(this);
+
         }
 
         @Override
         public void onClick(View view) {
-            Task currTask = taskList.get(getAdapterPosition());;
+            Task currTask = taskList.get(getAdapterPosition());
             int id = view.getId();
         if(id == R.id.todo_row_layout){
             onTodoClickListener.onTodoClick(getAdapterPosition(),currTask);

@@ -1,6 +1,7 @@
 package com.lemzeeyyy.taskmanagerapp.util;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -10,8 +11,10 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.lemzeeyyy.taskmanagerapp.data.TaskDao;
+import com.lemzeeyyy.taskmanagerapp.model.Priority;
 import com.lemzeeyyy.taskmanagerapp.model.Task;
 
+import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,6 +36,10 @@ public abstract class TaskRoomDatabase extends RoomDatabase {
                         //invoke dao
                         TaskDao taskDao = INSTANCE.taskDao();
                         taskDao.deleteAllTask();
+                        Task task = new Task("Pray", Priority.HIGH, Calendar.getInstance().getTime(),
+                                Calendar.getInstance().getTime(), true);
+                        taskDao.insertTask(task);
+                        Log.d("TAG", "onCreate: "+task.getTask());
                     });
                 }
             };

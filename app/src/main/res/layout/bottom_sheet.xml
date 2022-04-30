@@ -19,6 +19,10 @@
         android:hint="@string/enter_todo_hint"
         android:inputType="textPersonName"
         android:padding="@dimen/dimen_16"
+        android:shadowColor="#000000"
+        android:textColorHint="#000000"
+        android:textColor="#000000"
+        android:textColorHighlight="#4CAF50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -113,6 +117,7 @@
         android:id="@+id/calendar_view"
         android:layout_width="318dp"
         android:layout_height="296dp"
+        android:background="#000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"

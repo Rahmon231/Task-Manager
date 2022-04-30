@@ -144,7 +144,8 @@ public class BottomSheetFragment extends BottomSheetDialogFragment implements Vi
                     TaskViewModel.update(updateTask);
                     sharedViewModel.setEdit(false);
                 }else {
-                    TaskViewModel.insert(myTast);
+                       // enterTodo.setText("");
+                        TaskViewModel.insert(myTast);
                 }
                 enterTodo.setText("");
 

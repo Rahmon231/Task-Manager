@@ -3,6 +3,7 @@ package com.lemzeeyyy.taskmanagerapp;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -29,7 +30,10 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnTodoClickListener {
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
     private int counter = 0;
     BottomSheetFragment bottomSheetFragment;
     private SharedViewModel sharedViewModel;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer = MediaPlayer.create(this,R.raw.watch_me);
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -57,21 +64,29 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
                 .AndroidViewModelFactory(MainActivity.this.getApplication())
                 .create(TaskViewModel.class);
         taskViewModel.getAllTasks().observe(this, tasks -> {
-
-            adapter = new RecyclerViewAdapter(tasks,this);
+            adapter = new RecyclerViewAdapter(tasks,this,MainActivity.this);
             recyclerView.setAdapter(adapter);
+            for(int i = 0 ; i < tasks.size() ; i++){
+                if(tasks.get(i).getTask().equals("Play football")){
+                    mediaPlayer.start();
+                }
+               // Log.d("tasklists", "onCreate: "+tasks.get(i));
+            }
+
         });
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
-
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             showButtomSheetDialog();
         });
     }
 
+    private void playMedia() {
+        mediaPlayer.start();
+    }
+
     private void showButtomSheetDialog() {
-        bottomSheetFragment.show(getSupportFragmentManager(),bottomSheetFragment.getTag());
+            bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
     @Override
@@ -98,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
 
     @Override
     public void onTodoClick(int position, Task task) {
-        //Log.d("Clicked", "onTodoClick: "+task.getTask());
+        Log.d("Clicked", "onTodoClick: "+Calendar.getInstance().getTime());
         sharedViewModel.setEdit(true);
         sharedViewModel.selectItem(task);
         showButtomSheetDialog();
@@ -115,7 +130,10 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
         adapter.notifyDataSetChanged();
-
     }
 
+    @Override
+    public void getTask(int position, Task task) {
+        Log.d("taggettasked", "getTask: "+task.getTask());
+    }
 }
