@@ -3,6 +3,7 @@ package com.lemzeeyyy.taskmanagerapp;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -17,6 +18,7 @@ import com.lemzeeyyy.taskmanagerapp.model.Task;
 import com.lemzeeyyy.taskmanagerapp.model.TaskViewModel;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
@@ -31,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -66,11 +69,11 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
         taskViewModel.getAllTasks().observe(this, tasks -> {
             adapter = new RecyclerViewAdapter(tasks,this,MainActivity.this);
             recyclerView.setAdapter(adapter);
+
             for(int i = 0 ; i < tasks.size() ; i++){
-                if(tasks.get(i).getTask().equals("Play football")){
+                if(tasks.get(i).getDueDate().equals(Calendar.getInstance().getTime())){
                     mediaPlayer.start();
-                }
-               // Log.d("tasklists", "onCreate: "+tasks.get(i));
+                   }
             }
 
         });
@@ -92,6 +95,16 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+         SharedPreferences preferences = getSharedPreferences("shared_pref",MODE_PRIVATE);
+        final SharedPreferences.Editor editor = preferences.edit();
+        final boolean isLightMode = preferences.getBoolean("isLightMode",true);
+        editor.apply();
+        if(isLightMode){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+        }else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -108,6 +121,32 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
             Intent intent = new Intent(MainActivity.this, AboutActivity.class);
             startActivity(intent);
         }
+        else {
+            SharedPreferences preferences = getSharedPreferences("shared_pref",MODE_PRIVATE);
+            final SharedPreferences.Editor editor = preferences.edit();
+            final boolean isLightMode = preferences.getBoolean("isLightMode",true);
+            editor.apply();
+            if(isLightMode){
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+            }else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
+            if(isLightMode){
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                editor.putBoolean("isLightMode",false);
+                editor.apply();
+                item.setTitle("dark mode");
+
+
+            }else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                editor.putBoolean("isLightMode",true);
+                editor.apply();
+                item.setTitle("dark mode");
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -136,4 +175,5 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
     public void getTask(int position, Task task) {
         Log.d("taggettasked", "getTask: "+task.getTask());
     }
+
 }
