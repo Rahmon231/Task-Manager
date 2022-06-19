@@ -1,10 +1,14 @@
 package com.lemzeeyyy.taskmanagerapp;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -21,6 +25,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,8 +44,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements OnTodoClickListener {
+    private static final String CHANNEL_ID = "notification";
     private TaskViewModel taskViewModel;
     private RecyclerView recyclerView;
     private RecyclerViewAdapter adapter;
@@ -47,6 +55,9 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
     BottomSheetFragment bottomSheetFragment;
     private SharedViewModel sharedViewModel;
     private MediaPlayer mediaPlayer;
+    private Date dueDate;
+    private String taskTitle = "";
+    Calendar calendar = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         bottomSheetFragment = new BottomSheetFragment();
+        dueDate = calendar.getTime();
         ConstraintLayout constraintLayout = findViewById(R.id.bottomSheet);
         BottomSheetBehavior<ConstraintLayout> bottomSheetBehavior = BottomSheetBehavior.from(constraintLayout);
         bottomSheetBehavior.setPeekHeight(BottomSheetBehavior.STATE_HIDDEN);
@@ -69,11 +81,11 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
         taskViewModel.getAllTasks().observe(this, tasks -> {
             adapter = new RecyclerViewAdapter(tasks,this,MainActivity.this);
             recyclerView.setAdapter(adapter);
-
-            for(int i = 0 ; i < tasks.size() ; i++){
-                if(tasks.get(i).getDueDate().equals(Calendar.getInstance().getTime())){
-                    mediaPlayer.start();
-                   }
+            for (int i = 0; i < tasks.size(); i++) {
+               if(tasks.get(i).getDueDate().compareTo(dueDate)==0){
+                   setNotofication();
+                   taskTitle = tasks.get(i).getTask();
+               }
             }
 
         });
@@ -82,6 +94,42 @@ public class MainActivity extends AppCompatActivity implements OnTodoClickListen
         fab.setOnClickListener(view -> {
             showButtomSheetDialog();
         });
+    }
+
+    private void setNotofication() {
+            NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
+            NotificationCompat.Builder myNotificatn = new NotificationCompat.Builder(this,
+                    CHANNEL_ID);
+
+            myNotificatn.setContentTitle("1 new task");
+            myNotificatn.setContentText(taskTitle);
+            myNotificatn.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            myNotificatn.setSmallIcon(android.R.drawable.ic_input_add);
+
+            Intent intent = new Intent(this,MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pd = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_IMMUTABLE);
+            myNotificatn.setContentIntent(pd);
+            myNotificatn.setAutoCancel(true);
+            createNotificationChannel();
+            managerCompat.notify(1, myNotificatn.build());
+            //finish();
+
+    }
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private void playMedia() {
